@@ -1,0 +1,30 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from repository.category_repository import CategoryRepository
+from repository.color_repository import ColorRepository
+from schemas.request.category_request import CreateCategorySchema
+from schemas.response.category_response import CategoryResponseSchema
+from sqlalchemy.exc import IntegrityError
+from fastapi import HTTPException, status
+
+
+class CategoryService:
+    def __init__(self, db: AsyncSession):
+        self.category_repository = CategoryRepository(db)
+        self.color_repository = ColorRepository(db)
+
+    async def create_category(self, payload: CreateCategorySchema) -> CategoryResponseSchema:
+        try:
+            color = await self.color_repository.get_by_id(color_id=payload.color_id)
+            if not color:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Цвет не найден")
+            category = await self.category_repository.post(name=payload.name, color_id=payload.color_id)
+            return CategoryResponseSchema(
+                id=category.id,
+                name=category.name,
+                color_id=category.color_id
+            )
+        except IntegrityError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Категория с таким названием уже существует."
+            )

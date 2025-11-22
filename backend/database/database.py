@@ -8,7 +8,8 @@ engine = create_async_engine(os.getenv("DATABASE_URL"), echo=True)
 async_session = async_sessionmaker(
     engine,
     expire_on_commit=False,
-    class_=AsyncSession
+    class_=AsyncSession,
+    autoflush=False
 )
 Base = declarative_base()
 

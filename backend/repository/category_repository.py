@@ -27,3 +27,17 @@ class CategoryRepository:
         result = await self.db.execute(select(Category))
         categories = result.scalars().all()
         return categories
+
+    async def get_by_id(self, category_id: UUID) -> Category | None:
+        result = await self.db.execute(select(Category).where(Category.id == category_id))
+        category = result.scalar_one_or_none()
+        return category
+
+    async def patch(self, category: Category) -> Category:
+        try:
+            self.db.add(category)
+            await self.db.commit()
+            await self.db.refresh(category)
+            return category
+        except IntegrityError as e:
+            raise e

@@ -6,3 +6,7 @@ class CategoryResponseSchema(BaseModel):
     id: UUID
     name: str
     color_id: UUID
+
+
+class CategoriesResponseSchema(BaseModel):
+    categories: list[CategoryResponseSchema]

@@ -3,6 +3,7 @@ from uuid import UUID
 from sqlalchemy import select, delete
 from sqlalchemy.exc import IntegrityError
 from models.category import Category
+from typing import Sequence
 
 
 class CategoryRepository:
@@ -21,3 +22,8 @@ class CategoryRepository:
             return category
         except IntegrityError as e:
             raise e
+
+    async def get_all(self) -> Sequence[Category] | None:
+        result = await self.db.execute(select(Category))
+        categories = result.scalars().all()
+        return categories

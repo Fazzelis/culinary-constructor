@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from repository.category_repository import CategoryRepository
 from repository.color_repository import ColorRepository
 from schemas.request.category_request import CreateCategorySchema
-from schemas.response.category_response import CategoryResponseSchema
+from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 
@@ -28,3 +28,18 @@ class CategoryService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Категория с таким названием уже существует."
             )
+
+    async def get_all_categories(self) -> CategoriesResponseSchema:
+        categories = await self.category_repository.get_all()
+        response_categories = []
+        for category in categories:
+            response_categories.append(
+                CategoryResponseSchema(
+                    id=category.id,
+                    name=category.name,
+                    color_id=category.color_id
+                )
+            )
+        return CategoriesResponseSchema(
+            categories=response_categories
+        )

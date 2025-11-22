@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 
-@router.post("/create", response_model=ColorResponseSchema)
+@router.post("", response_model=ColorResponseSchema)
 async def create_color(
         payload: CreateColorSchema,
         color_service: ColorService = Depends(get_color_service)

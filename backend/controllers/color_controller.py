@@ -20,9 +20,18 @@ async def create_color(
     return await color_service.create_color(payload=payload)
 
 
-@router.get("")
+@router.get("", response_model=ColorResponseSchema)
 async def get_color_by_id(
         color_id: UUID,
         color_service: ColorService = Depends(get_color_service)
 ):
     return await color_service.get_color_by_id(color_id=color_id)
+
+
+@router.put("", response_model=ColorResponseSchema)
+async def update_color(
+        color_id: UUID,
+        payload: CreateColorSchema,
+        color_service: ColorService = Depends(get_color_service)
+):
+    return await color_service.update_color(color_id=color_id, payload=payload)

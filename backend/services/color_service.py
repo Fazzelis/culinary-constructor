@@ -4,22 +4,29 @@ from schemas.request.color_request import CreateColorSchema
 from schemas.response.color_response import ColorResponseSchema
 from uuid import UUID
 from fastapi import HTTPException, status
+from sqlalchemy.exc import IntegrityError
 
 
 class ColorService:
     def __init__(self, db: AsyncSession):
-        self.repo = ColorRepository(db)
+        self.color_repository = ColorRepository(db)
 
     async def create_color(self, payload: CreateColorSchema):
-        created_color = await self.repo.post(name=payload.name, hex_code=payload.hex_code)
-        return ColorResponseSchema(
-            id=created_color.id,
-            name=created_color.name,
-            hex_code=created_color.hex_code
-        )
+        try:
+            created_color = await self.color_repository.post(name=payload.name, hex_code=payload.hex_code)
+            return ColorResponseSchema(
+                id=created_color.id,
+                name=created_color.name,
+                hex_code=created_color.hex_code
+            )
+        except IntegrityError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Имя или код цвета уже существуют. {e.orig}"
+            )
 
     async def get_color_by_id(self, color_id: UUID):
-        color = await self.repo.get_by_id(color_id=color_id)
+        color = await self.color_repository.get_by_id(color_id=color_id)
         if not color:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Цвет с id = {color_id} не найден")
         return ColorResponseSchema(
@@ -27,3 +34,24 @@ class ColorService:
             name=color.name,
             hex_code=color.hex_code
         )
+
+    async def update_color(
+            self,
+            color_id: UUID,
+            payload: CreateColorSchema
+    ):
+        try:
+            old_color = await self.color_repository.get_by_id(color_id=color_id)
+            if not old_color:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Цвет с id = {color_id} не найден")
+            new_color = await self.color_repository.put(name=payload.name, hex_code=payload.hex_code, color=old_color)
+            return ColorResponseSchema(
+                id=new_color.id,
+                name=new_color.name,
+                hex_code=new_color.hex_code
+            )
+        except IntegrityError as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Имя или код цвета уже существуют. {e.orig}"
+            )

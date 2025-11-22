@@ -3,6 +3,7 @@ from schemas.request.color_request import CreateColorSchema
 from services.color_service import ColorService
 from dependencies import get_color_service
 from schemas.response.color_response import ColorResponseSchema
+from uuid import UUID
 
 
 router = APIRouter(
@@ -17,3 +18,11 @@ async def create_color(
         color_service: ColorService = Depends(get_color_service)
 ):
     return await color_service.create_color(payload=payload)
+
+
+@router.get("")
+async def get_color_by_id(
+        color_id: UUID,
+        color_service: ColorService = Depends(get_color_service)
+):
+    return await color_service.get_color_by_id(color_id=color_id)

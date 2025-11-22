@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.color import Color
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
+from uuid import UUID
+from sqlalchemy import select
 
 
 class ColorRepository:
@@ -24,3 +26,8 @@ class ColorRepository:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Имя или код цвета уже существуют. {e.orig}"
             )
+
+    async def get_by_id(self, color_id: UUID) -> Color | None:
+        result = await self.db.execute(select(Color).where(Color.id == color_id))
+        color = result.scalar_one_or_none()
+        return color

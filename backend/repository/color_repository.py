@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.color import Color
 from sqlalchemy.exc import IntegrityError
 from uuid import UUID
-from sqlalchemy import select
+from sqlalchemy import select, delete
 
 
 class ColorRepository:
@@ -39,3 +39,8 @@ class ColorRepository:
         except IntegrityError as e:
             await self.db.rollback()
             raise e
+
+    async def delete(self, color_id) -> int:
+        result = await self.db.execute(delete(Color).where(Color.id == color_id))
+        await self.db.commit()
+        return result.rowcount

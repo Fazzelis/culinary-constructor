@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from schemas.request.category_request import CategoryRequestSchema, CategoryPatchRequestSchema
-from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema
+from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema, DeleteCategoryResponseSchema
 from services.category_service import CategoryService
 from dependencies import get_category_service
 from uuid import UUID
@@ -34,3 +34,11 @@ async def patch_category(
         category_service: CategoryService = Depends(get_category_service)
 ):
     return await category_service.patch_category(category_id=category_id, payload=payload)
+
+
+@router.delete("", response_model=DeleteCategoryResponseSchema)
+async def delete_category(
+        category_id: UUID,
+        category_service: CategoryService = Depends(get_category_service)
+):
+    return await category_service.delete_category(category_id=category_id)

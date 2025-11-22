@@ -2,7 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from repository.category_repository import CategoryRepository
 from repository.color_repository import ColorRepository
 from schemas.request.category_request import CategoryRequestSchema, CategoryPatchRequestSchema
-from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema
+from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema, DeleteCategoryResponseSchema
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from uuid import UUID
@@ -70,3 +70,10 @@ class CategoryService:
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Категория с таким названием уже существует"
             )
+
+    async def delete_category(self, category_id: UUID) -> DeleteCategoryResponseSchema:
+        row_count = await self.category_repository.delete(category_id=category_id)
+        return DeleteCategoryResponseSchema(
+            id=category_id,
+            row_count=row_count
+        )

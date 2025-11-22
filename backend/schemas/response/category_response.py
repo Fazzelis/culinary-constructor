@@ -10,3 +10,8 @@ class CategoryResponseSchema(BaseModel):
 
 class CategoriesResponseSchema(BaseModel):
     categories: list[CategoryResponseSchema]
+
+
+class DeleteCategoryResponseSchema(BaseModel):
+    id: UUID
+    row_count: int

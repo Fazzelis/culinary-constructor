@@ -41,3 +41,8 @@ class CategoryRepository:
             return category
         except IntegrityError as e:
             raise e
+
+    async def delete(self, category_id: UUID) -> int:
+        result = await self.db.execute(delete(Category).where(Category.id == category_id))
+        await self.db.commit()
+        return result.rowcount

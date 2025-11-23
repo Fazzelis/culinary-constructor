@@ -27,6 +27,14 @@ async def get_all_categories(
     return await category_service.get_all_categories()
 
 
+@router.get("/ingredients")
+async def get_category_ingredients(
+        category_id: UUID,
+        category_service: CategoryService = Depends(get_category_service)
+):
+    return await category_service.get_category_ingredients(category_id=category_id)
+
+
 @router.patch("", response_model=CategoryResponseSchema)
 async def patch_category(
         category_id: UUID,

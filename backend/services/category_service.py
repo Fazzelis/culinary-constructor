@@ -4,7 +4,7 @@ from repository.color_repository import ColorRepository
 from repository.ingredient_repository import IngredientRepository
 from schemas.request.category_request import CategoryRequestSchema, CategoryPatchRequestSchema
 from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema, DeleteCategoryResponseSchema
-from schemas.response.category_response import CategoryIngredientsResponseSchema
+from schemas.response.category_response import CategoryIngredientsResponseSchema, CategoryWithoutColorIdResponseSchema
 from schemas.response.ingredient_response import IngredientForCategoryResponseSchema
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
@@ -39,10 +39,9 @@ class CategoryService:
         response_categories = []
         for category in categories:
             response_categories.append(
-                CategoryResponseSchema(
+                CategoryWithoutColorIdResponseSchema(
                     id=category.id,
-                    name=category.name,
-                    color_id=category.color_id
+                    name=category.name
                 )
             )
         return CategoriesResponseSchema(

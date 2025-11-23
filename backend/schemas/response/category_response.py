@@ -9,8 +9,13 @@ class CategoryResponseSchema(BaseModel):
     color_id: UUID
 
 
+class CategoryWithoutColorIdResponseSchema(BaseModel):
+    id: UUID
+    name: str
+
+
 class CategoriesResponseSchema(BaseModel):
-    categories: list[CategoryResponseSchema]
+    categories: list[CategoryWithoutColorIdResponseSchema]
 
 
 class DeleteCategoryResponseSchema(BaseModel):

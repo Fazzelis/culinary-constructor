@@ -118,7 +118,7 @@ export default {
   &__body {
     display: flex;
     flex-direction: column;
-    row-gap: 50px;
+    row-gap: 40px;
   }
 
   &__info {

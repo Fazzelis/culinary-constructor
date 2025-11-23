@@ -15,6 +15,12 @@ const router = createRouter({
             component: () => import("@/pages/Catalog.vue"),
             meta: { requiresAuth: false },
         },
+        {
+            path: "/dish/:id",
+            name: "dish",
+            component: () => import("@/pages/dish/[id].vue"),
+            meta: { requiresAuth: false },
+        }
     ]
 });
 

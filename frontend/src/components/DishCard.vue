@@ -1,6 +1,6 @@
 <template>
   <div class="dish-card">
-    <img :src="dish.img" alt="" class="dish-card__img" />
+    <img :src="dish.img" alt="" class="dish-card__img" width="250" height="150"/>
     <div class="dish-card__body">
       <div class="dish-card__tags">
         <dish-tag>
@@ -63,6 +63,8 @@ export default {
   }
 
   &__img {
+    width: 250px;
+    height: 150px;
     border-radius: 16px;
   }
 

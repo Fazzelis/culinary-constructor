@@ -2,6 +2,7 @@ from services.color_service import ColorService
 from services.category_service import CategoryService
 from services.ingredient_service import IngredientService
 from services.recipe_step_service import RecipeStepService
+from services.attachment_service import AttachmentService
 from services.dish_service import DishService
 from database.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,3 +27,7 @@ async def get_recipe_step_service(db: AsyncSession = Depends(get_db)):
 
 async def get_dish_service(db: AsyncSession = Depends(get_db)):
     return DishService(db)
+
+
+async def get_attachment_service(db: AsyncSession = Depends(get_db)):
+    return AttachmentService(db)

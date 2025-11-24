@@ -26,3 +26,10 @@ async def get_dish(
         dish_service: DishService = Depends(get_dish_service)
 ):
     return await dish_service.get_dish(dish_id=dish_id)
+
+
+@router.get("/all")
+async def get_all_dishes(
+        dish_service: DishService = Depends(get_dish_service)
+):
+    return await dish_service.get_all_dishes()

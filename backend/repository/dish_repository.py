@@ -30,6 +30,11 @@ class DishRepository:
         dish = result.scalar_one_or_none()
         return dish
 
+    async def get_all(self):
+        result = await self.db.execute(select(Dish))
+        dishes = result.scalars().all()
+        return dishes
+
     async def delete(self, dish_id: UUID):
         result = await self.db.execute(delete(Dish).where(Dish.id == dish_id))
         await self.db.commit()

@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from uuid import UUID
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
+from schemas.internal.dish_schema import DishForCatalogSchema
 
 
 class DishResponseSchema(BaseModel):
@@ -11,3 +12,7 @@ class DishResponseSchema(BaseModel):
     img: str
     ingredients: list[IngredientSchema]
     recipe_steps: list[RecipeSchema]
+
+
+class DishesResponseSchema(BaseModel):
+    dishes: list[DishForCatalogSchema]

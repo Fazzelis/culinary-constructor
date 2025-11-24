@@ -6,13 +6,12 @@ from repository.dish_ingredient_association_repository import DishIngredientRepo
 from repository.attachment_repository import AttachmentRepository
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
-from schemas.response.dish_response import DishResponseSchema
-from schemas.internal.ingredient_schema import IngredientSchema
-from schemas.internal.recipe_schema import RecipeSchema
+from schemas.response.dish_response import DishResponseSchema, DishesResponseSchema
 from configuration import settings
 from uuid import UUID
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
+from schemas.internal.dish_schema import DishForCatalogSchema
 
 
 class DishService:
@@ -101,4 +100,21 @@ class DishService:
             img=dish.img,
             ingredients=ingredients,
             recipe_steps=recipe_steps
+        )
+
+    async def get_all_dishes(self) -> DishesResponseSchema:
+        dishes = await self.dish_repository.get_all()
+        dishes_response = []
+        for dish in dishes:
+            dishes_response.append(
+                DishForCatalogSchema(
+                    id=dish.id,
+                    name=dish.name,
+                    description=dish.description,
+                    img=dish.img
+                )
+            )
+
+        return DishesResponseSchema(
+            dishes=dishes_response
         )

@@ -10,7 +10,7 @@ from models.category import Category
 from models.ingredient import Ingredient
 from models.dish import Dish
 from models.recipe_step import RecipeStep
-from models.dish_recipe_step_association import DishRecipeStepAssociation
+from models.dish_ingredient_association import DishIngredientAssociation
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

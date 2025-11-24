@@ -9,5 +9,6 @@ class RecipeStep(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     step_number = Column(Integer)
     description = Column(Text)
+    dish_id = Column(UUID(as_uuid=True), ForeignKey("dish.id"))
 
-    dish_associations = relationship("DishRecipeStepAssociation", back_populates="recipe_step")
+    dish = relationship("Dish", back_populates="recipe_steps")

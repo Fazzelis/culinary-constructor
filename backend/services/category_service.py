@@ -1,8 +1,11 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from repository.category_repository import CategoryRepository
 from repository.color_repository import ColorRepository
+from repository.ingredient_repository import IngredientRepository
 from schemas.request.category_request import CategoryRequestSchema, CategoryPatchRequestSchema
 from schemas.response.category_response import CategoryResponseSchema, CategoriesResponseSchema, DeleteCategoryResponseSchema
+from schemas.response.category_response import CategoryIngredientsResponseSchema, CategoryWithoutColorIdResponseSchema
+from schemas.response.ingredient_response import IngredientForCategoryResponseSchema
 from sqlalchemy.exc import IntegrityError
 from fastapi import HTTPException, status
 from uuid import UUID
@@ -12,6 +15,7 @@ class CategoryService:
     def __init__(self, db: AsyncSession):
         self.category_repository = CategoryRepository(db)
         self.color_repository = ColorRepository(db)
+        self.ingredient_repository = IngredientRepository(db)
 
     async def create_category(self, payload: CategoryRequestSchema) -> CategoryResponseSchema:
         try:
@@ -35,14 +39,27 @@ class CategoryService:
         response_categories = []
         for category in categories:
             response_categories.append(
-                CategoryResponseSchema(
+                CategoryWithoutColorIdResponseSchema(
                     id=category.id,
-                    name=category.name,
-                    color_id=category.color_id
+                    name=category.name
                 )
             )
         return CategoriesResponseSchema(
             categories=response_categories
+        )
+
+    async def get_category_ingredients(self, category_id: UUID) -> CategoryIngredientsResponseSchema:
+        category, color_hex = await self.category_repository.get_with_color_code_and_ingredients(category_id=category_id)
+        if not category:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Категория с id {category_id} не найдена"
+            )
+        return CategoryIngredientsResponseSchema(
+            color=color_hex,
+            ingredients=[
+                IngredientForCategoryResponseSchema.model_validate(ingredient) for ingredient in category.ingredients
+            ]
         )
 
     async def patch_category(self, category_id: UUID, payload: CategoryPatchRequestSchema) -> CategoryResponseSchema:

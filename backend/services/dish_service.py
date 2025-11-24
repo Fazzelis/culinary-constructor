@@ -51,5 +51,4 @@ class DishService:
                 recipe_steps=recipe_steps
             )
         except IntegrityError as e:
-            await self.dish_repository.delete(dish_id=dish.id)
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=e.orig)
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.orig}")

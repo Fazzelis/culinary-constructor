@@ -20,4 +20,5 @@ class RecipeStepRepository:
             await self.db.refresh(recipe_step)
             return recipe_step
         except IntegrityError as e:
+            await self.db.rollback()
             raise e

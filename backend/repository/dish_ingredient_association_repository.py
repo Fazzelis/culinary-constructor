@@ -20,4 +20,5 @@ class DishIngredientRepository:
             await self.db.refresh(association, ["ingredient"])
             return association
         except IntegrityError as e:
+            await self.db.rollback()
             raise e

@@ -9,6 +9,7 @@ class Dish(Base):
     __tablename__ = "dish"
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     name = Column(String)
+    description = Column(String)
 
     recipe_steps = relationship("RecipeStep", back_populates="dish", order_by=RecipeStep.step_number)
     ingredient_associations = relationship("DishIngredientAssociation", back_populates="dish")

@@ -1,16 +1,22 @@
 <template>
-  <div class="category" :style="{ '--category-color': category.color }">
-    <button type="button" class="category__name" :class="{ 'category__name--rotate': !openCategories[category.id] }" @click="$emit('toggleCategory', category.id)">
+  <div class="category">
+    <button
+      type="button"
+      class="category__name"
+      :class="{ 'category__name--rotate': !openCategories[category.id] }"
+      @click="$emit('toggleCategory', category.id)"
+    >
       {{ category.name }}
-      <SvgTriangle  />
+      <SvgTriangle />
     </button>
     <transition name="category-list">
-      <ul class="category__list" v-show="openCategories[category.id]">
+      <ul class="category__list" v-show="openCategories[category.id]" v-if="categoryIngredients">
         <IngredientItem
-          v-for="ingredient in category.ingredients"
+          v-for="ingredient in categoryIngredients.ingredients"
           :key="ingredient.id"
           :ingredient="ingredient"
           :selectedIngredients="selectedIngredients"
+          :color="categoryIngredients.color"
           @toggleIngredient="$emit('toggleIngredient', ingredient)"
         />
       </ul>
@@ -29,15 +35,28 @@ export default {
       type: Object,
       required: true,
     },
+    categoryIngredients: {
+      type: Object,
+      required: true,
+    },
     openCategories: {
       type: Object,
       required: true,
     },
     selectedIngredients: {
-        type: Object,
-        required: true,
+      type: Object,
+      required: true,
+    },
+  },
+  methods: {
+    log() {
+      console.log(this.categoryIngredients);
+      
     }
   },
+  mounted() {
+    this.log()
+  }
 };
 </script>
 
@@ -73,40 +92,6 @@ export default {
     column-gap: 60px;
     row-gap: 30px;
     flex-wrap: wrap;
-  }
-
-  &__item {
-    position: relative;
-    display: inline-block;
-    padding: 30px 20px 15px 20px;
-    background-color: @light;
-    color: @black;
-    font-family: @font;
-    border-radius: 12px;
-    cursor: pointer;
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 15px;
-      left: 20px;
-      width: 20px;
-      height: 10px;
-      background-color: var(--category-color);
-      transition: 0.3s;
-    }
-
-    &--selected {
-      &::before {
-        background-color: @light;
-      }
-      background-color: var(--category-color);
-    }
-    &:hover {
-      &::before {
-        width: calc(100% - 40px);
-      }
-    }
   }
 }
 

@@ -9,6 +9,7 @@
           :category="category"
           :openCategories="openCategories"
           :selectedIngredients="selectedIngredients"
+          :categoryIngredients="categoryIngredients[category.id]"
           @toggleCategory="toggleCategory"
           @toggleIngredient="toggleIngredient"
         />
@@ -17,13 +18,14 @@
         <span class="constructor__counter"
           >Выбрано ингредиентов: {{ countIngredients }}</span
         >
-        <MyButton @click="log">Подобрать рецепт</MyButton>
+        <MyButton>Подобрать рецепт</MyButton>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { API_URL } from "../api.config";
 import SvgTriangle from "../assets/icons/SvgTriangle.vue";
 import CategoryItem from "../components/CategoryItem.vue";
 import MyButton from "../components/UI/MyButton.vue";
@@ -35,57 +37,45 @@ export default {
       countIngredients: 0,
       openCategories: {},
       selectedIngredients: [],
-      categories: [
-        {
-          id: 1,
-          name: "Мясо",
-          color: "#FFBDC8",
-          ingredients: [
-            {
-              id: 11,
-              name: "Курица",
-            },
-          ],
-        },
-        {
-          id: 2,
-          name: "Овощи",
-          color: "#A8F792",
-          ingredients: [
-            {
-              id: 12,
-              name: "Помидор",
-            },
-          ],
-        },
-        {
-          id: 3,
-          name: "Фрукты",
-          color: "#FFBDC8",
-          ingredients: [
-            {
-              id: 13,
-              name: "Яблоко",
-            },
-          ],
-        },
-        {
-          id: 4,
-          name: "Рыба",
-          color: "#FFBDC8",
-          ingredients: [
-            {
-              id: 14,
-              name: "Форель",
-            },
-          ],
-        },
-      ],
+      categories: [],
+      categoryIngredients: {},
     };
   },
   methods: {
-    toggleCategory(id) {
+    async getCategories() {
+      try {
+        const response = await fetch(`${API_URL}/category`);
+        const result = await response.json();
+        this.categories = result.categories;
+      } catch (e) {
+        console.log("Ошибка получения категорий: ", e);
+      }
+    },
+    async toggleCategory(id) {
       this.openCategories[id] = !this.openCategories[id];
+
+      if (this.openCategories[id]) {
+        const saveCategory = localStorage.getItem(`${id}`);
+        const category = saveCategory ? JSON.parse(saveCategory) : null;
+
+        if (category) {
+          this.categoryIngredients = {
+            ...this.categoryIngredients,
+            [id]: category,
+          };
+        } else {
+          const response = await fetch(
+            `${API_URL}/category/ingredients?category_id=${id}`
+          );
+          const result = await response.json();
+          this.categoryIngredients = {
+            ...this.categoryIngredients,
+            [id]: result,
+          };
+
+          localStorage.setItem(`${id}`, JSON.stringify(result));
+        }
+      }
     },
     toggleIngredient(ingredient) {
       const index = this.selectedIngredients.indexOf(ingredient.id);
@@ -95,14 +85,14 @@ export default {
         this.selectedIngredients.splice(index, 1);
       }
     },
-    log() {
-      console.log(this.selectedIngredients);
-    },
   },
   computed: {
     countIngredients() {
       return this.selectedIngredients.length;
     },
+  },
+  mounted() {
+    this.getCategories();
   },
 };
 </script>

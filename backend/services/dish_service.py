@@ -10,6 +10,9 @@ from schemas.response.dish_response import DishResponseSchema
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
 from configuration import settings
+from uuid import UUID
+from schemas.internal.ingredient_schema import IngredientSchema
+from schemas.internal.recipe_schema import RecipeSchema
 
 
 class DishService:
@@ -63,3 +66,39 @@ class DishService:
             )
         except IntegrityError as e:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"{e.orig}")
+
+    async def get_dish(self, dish_id: UUID) -> DishResponseSchema:
+        dish = await self.dish_repository.get(dish_id=dish_id)
+        if not dish:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Блюдо с id {dish_id} не найдено"
+            )
+        ingredients = []
+        for ingredient_association in dish.ingredient_associations:
+            ingredients.append(
+                IngredientSchema(
+                    id=ingredient_association.ingredient.id,
+                    name=ingredient_association.ingredient.name,
+                    count=ingredient_association.count
+                )
+            )
+
+        recipe_steps = []
+        for recipe_step in dish.recipe_steps:
+            recipe_steps.append(
+                RecipeSchema(
+                    id=recipe_step.id,
+                    step_number=recipe_step.step_number,
+                    description=recipe_step.description
+                )
+            )
+
+        return DishResponseSchema(
+            id=dish.id,
+            name=dish.name,
+            description=dish.description,
+            img=dish.img,
+            ingredients=ingredients,
+            recipe_steps=recipe_steps
+        )

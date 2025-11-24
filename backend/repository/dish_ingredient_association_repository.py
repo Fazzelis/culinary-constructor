@@ -2,6 +2,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from models.dish_ingredient_association import DishIngredientAssociation
 from uuid import UUID
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
+from models.ingredient import Ingredient
 
 
 class DishIngredientRepository:
@@ -22,3 +24,12 @@ class DishIngredientRepository:
         except IntegrityError as e:
             await self.db.rollback()
             raise e
+
+    # async def get_by_dish_id(self, dish_id: UUID):
+    #     result = await self.db.execute(
+    #         select(DishIngredientAssociation, Ingredient.name)
+    #         .join(Ingredient, DishIngredientAssociation.ingredient_id == Ingredient.id)
+    #         .where(DishIngredientAssociation.dish_id == dish_id)
+    #     )
+    #
+    #     response = result

@@ -17,7 +17,7 @@ class DishService:
         self.dish_ingredient_repository = DishIngredientRepository(db)
 
     async def create_dish(self, payload: DishRequestSchema) -> DishResponseSchema:
-        dish = await self.dish_repository.post(name=payload.name)
+        dish = await self.dish_repository.post(name=payload.name, description=payload.description)
 
         try:
             recipe_steps = []

@@ -11,6 +11,7 @@ from models.ingredient import Ingredient
 from models.dish import Dish
 from models.recipe_step import RecipeStep
 from models.dish_ingredient_association import DishIngredientAssociation
+from models.attachment import Attachment
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

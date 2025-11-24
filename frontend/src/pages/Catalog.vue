@@ -28,7 +28,7 @@ export default {
       dishList: [
         {
           id: 1,
-          img: "/dish1.png",
+          img: "/dish1_big.png",
           countIngredients: 3,
           time: "1 час",
           name: "Паста болоньезе",
@@ -37,7 +37,7 @@ export default {
         },
         {
           id: 2,
-          img: "/dish1.png",
+          img: "/dish1_big.png",
           countIngredients: 3,
           time: "1 час",
           name: "Паста болоньезе",
@@ -56,6 +56,10 @@ export default {
     display: flex;
     flex-direction: column;
     row-gap: 60px;
+  }
+
+  &__title {
+    text-align: center;
   }
 
   &__info {

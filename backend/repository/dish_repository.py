@@ -8,8 +8,8 @@ class DishRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def post(self, name: str, description: str) -> Dish:
-        dish = Dish(name=name, description=description)
+    async def post(self, name: str, description: str, img: str) -> Dish:
+        dish = Dish(name=name, description=description, img=img)
         self.db.add(dish)
         await self.db.commit()
         await self.db.refresh(dish)

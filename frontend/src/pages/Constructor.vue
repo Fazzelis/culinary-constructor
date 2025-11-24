@@ -105,6 +105,10 @@ export default {
     row-gap: 60px;
   }
 
+  &__title {
+    text-align: center;
+  }
+
   &__body {
     display: flex;
     flex-direction: column;

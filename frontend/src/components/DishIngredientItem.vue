@@ -3,7 +3,7 @@
     <div class="dish-ingredient__item">
       <span class="dish-ingredient__text">{{ ingredient.name }}</span>
       <span class="dish-ingredient__dots"></span>
-      <span class="dish-ingredient__text">{{ ingredient.counter }}</span>
+      <span class="dish-ingredient__text">{{ ingredient.count }}</span>
     </div>
   </li>
 </template>

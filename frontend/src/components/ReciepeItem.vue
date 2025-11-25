@@ -1,11 +1,11 @@
 <template>
   <li class="reciepe">
     <div class="reciepe__step">
-      <span class="reciepe__step-text reciepe__step-text--m">{{ reciepe.step }}</span>
+      <span class="reciepe__step-text reciepe__step-text--m">{{ reciepe.step_number }}</span>
       <span class="reciepe__step-text reciepe__step-text--s">шаг</span>
     </div>
     <div class="reciepe__text">
-      <p>{{ reciepe.text }}</p>
+      <p>{{ reciepe.description }}</p>
     </div>
   </li>
 </template>

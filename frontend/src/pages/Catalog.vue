@@ -4,18 +4,27 @@
       <div class="catalog__info">
         <h1 class="catalog__title title">Каталог</h1>
         <span class="catalog__counter"
-          >Найдено рецептов: {{ dishList.length }}</span
+          >Найдено рецептов: {{ totalCount }}</span
         >
       </div>
       <dish-list :dishList="dishList" />
       <div class="catalog__pagination pagination">
-        <my-button-s class="pagination__item">1</my-button-s>
+        <my-button-s
+          v-for="page in visiblePages"
+          :key="page"
+          class="pagination__item"
+          :class="{ active: page === currentPage, dots: page === '...' }"
+          @click="page !== '...' && goPage(page)"
+        >
+          {{ page }}
+        </my-button-s>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { API_URL } from "../api.config";
 import SvgTagIngredient from "../assets/icons/SvgTagIngredient.vue";
 import SvgTagTime from "../assets/icons/SvgTagTime.vue";
 import DishList from "../components/DishList.vue";
@@ -25,27 +34,76 @@ export default {
   components: { SvgTagIngredient, SvgTagTime, MyButtonS, DishList },
   data() {
     return {
-      dishList: [
-        {
-          id: 1,
-          img: "/dish1_big.png",
-          countIngredients: 3,
-          time: "1 час",
-          name: "Паста болоньезе",
-          description:
-            "Блюдо итальянского происхождения, разновидность сервировки пасты, а также используемый при такой сервировке мясной соус",
-        },
-        {
-          id: 2,
-          img: "/dish1_big.png",
-          countIngredients: 3,
-          time: "1 час",
-          name: "Паста болоньезе",
-          description:
-            "Блюдо итальянского происхождения, разновидность сервировки пасты, а также используемый при такой сервировке мясной соус",
-        },
-      ],
+      page: 1,
+      limit: 5,
+      totalPages: 0,
+      totalCount: 0,
+      dishList: [],
     };
+  },
+  methods: {
+    async getDishList() {
+      try {
+        const response = await fetch(
+          `${API_URL}/dish/all?page=${this.page}&page_size=${this.limit}`
+        );
+        const result = await response.json();
+        this.dishList = result.dishes;
+        this.totalPages = result.pagination.total_pages;
+        this.totalCount = result.pagination.total_count
+      } catch (e) {
+        console.log("Ошибка получения списка блюд: ", e);
+      }
+    },
+    async goPage(pageNum) {
+      try {
+        const response = await fetch(
+          `${API_URL}/dish/all?page=${pageNum}&page_size=${this.limit}`
+        );
+        const result = await response.json();
+        this.dishList = result.dishes;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (e) {
+        console.log("Ошибка получения списка блюд: ", e);
+      }
+    },
+  },
+  computed: {
+    visiblePages() {
+      const total = this.totalPages;
+      const current = this.currentPage;
+      const delta = 2;
+      const range = [];
+      const rangeWithDots = [];
+      let l;
+
+      for (let i = 1; i <= total; i++) {
+        if (
+          i === 1 ||
+          i === total ||
+          (i >= current - delta && i <= current + delta)
+        ) {
+          range.push(i);
+        }
+      }
+
+      for (let i of range) {
+        if (l) {
+          if (i - l === 2) {
+            rangeWithDots.push(l + 1);
+          } else if (i - l !== 1) {
+            rangeWithDots.push("...");
+          }
+        }
+        rangeWithDots.push(i);
+        l = i;
+      }
+
+      return rangeWithDots;
+    },
+  },
+  mounted() {
+    this.getDishList();
   },
 };
 </script>

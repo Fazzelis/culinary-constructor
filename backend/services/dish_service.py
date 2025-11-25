@@ -112,7 +112,37 @@ class DishService:
                     id=dish.id,
                     name=dish.name,
                     description=dish.description,
-                    img=dish.img
+                    img=dish.img,
+                    total_ingredients=len(dish.ingredient_associations)
+                )
+            )
+
+        return DishesResponseSchema(
+            pagination=PaginationSchema(
+                page=page,
+                page_size=page_size,
+                total_count=total_count,
+                total_pages=(total_count + page_size - 1) // page_size
+            ),
+            dishes=dishes_response
+        )
+
+    async def get_dishes_by_ingredients(self, ingredients: list[UUID], page: int, page_size: int):
+        dishes, total_count = await self.dish_repository.get_by_ingredient_ids(
+            ingredient_ids=ingredients,
+            page=page,
+            page_size=page_size
+        )
+
+        dishes_response = []
+        for dish in dishes:
+            dishes_response.append(
+                DishForCatalogSchema(
+                    id=dish.id,
+                    name=dish.name,
+                    description=dish.description,
+                    img=dish.img,
+                    total_ingredients=len(dish.ingredient_associations)
                 )
             )
 

@@ -32,10 +32,53 @@ class DishRepository:
 
     async def get_all(self, page: int, page_size: int):
         offset = (page - 1) * page_size
-        result = await self.db.execute(select(Dish).offset(offset).limit(page_size))
+        result = await self.db.execute(
+            select(Dish)
+            .offset(offset)
+            .limit(page_size)
+            .options(
+                selectinload(Dish.ingredient_associations)
+            )
+        )
         dishes = result.scalars().all()
         count_result = await self.db.execute(select(func.count(Dish.id)))
         total_count = count_result.scalar_one()
+        return dishes, total_count
+
+    async def get_by_ingredient_ids(self, ingredient_ids: list[UUID], page: int, page_size: int):
+        ingredients_count = len(ingredient_ids)
+        offset = (page - 1) * page_size
+        result = await self.db.execute(
+            select(Dish)
+            .join(Dish.ingredient_associations)
+            .where(DishIngredientAssociation.ingredient_id.in_(ingredient_ids))
+            .group_by(Dish.id)
+            .having(func.count(DishIngredientAssociation.ingredient_id) == ingredients_count)
+            .order_by(func.count(DishIngredientAssociation.ingredient_id).asc())
+            .offset(offset)
+            .limit(page_size)
+            .options(
+                selectinload(Dish.recipe_steps),
+                selectinload(Dish.ingredient_associations)
+                .selectinload(DishIngredientAssociation.ingredient)
+            )
+        )
+
+        dishes = result.scalars().all()
+
+        matching_dishes_subquery = (
+            select(Dish.id)
+            .join(Dish.ingredient_associations)
+            .where(DishIngredientAssociation.ingredient_id.in_(ingredient_ids))
+            .group_by(Dish.id)
+            .having(func.count(DishIngredientAssociation.ingredient_id) == ingredients_count)
+        ).subquery()
+
+        count_result = await self.db.execute(
+            select(func.count()).select_from(matching_dishes_subquery)
+        )
+        total_count = count_result.scalar_one()
+
         return dishes, total_count
 
     async def delete(self, dish_id: UUID):

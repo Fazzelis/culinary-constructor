@@ -7,3 +7,4 @@ class DishForCatalogSchema(BaseModel):
     name: str
     description: str
     img: str
+    total_ingredients: int

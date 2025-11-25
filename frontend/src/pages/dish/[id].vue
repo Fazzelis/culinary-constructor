@@ -19,11 +19,11 @@
           </div>
           <div class="dish__info-block2">
             <h2 class="dish__subtitle">Энергетическая ценность</h2>
-            <div class="dish__calories">
+            <!-- <div class="dish__calories">
               <CaloriesItem v-for="calories in dish.caloriesList" :key="calories.id" :calories="calories">
                 <SvgSquirrels />
               </CaloriesItem>
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -40,7 +40,7 @@
       <div class="dish__reciepe">
         <ul class="dish__reciepe-list">
           <ReciepeItem
-            v-for="reciepe in dish.reciepeList"
+            v-for="reciepe in dish.recipe_steps"
             :key="reciepe.id"
             :reciepe="reciepe"
           />
@@ -51,6 +51,7 @@
 </template>
 
 <script>
+import { API_URL } from "../../api.config";
 import SvgSquirrels from "../../assets/icons/SvgSquirrels.vue";
 import CaloriesItem from "../../components/CaloriesItem.vue";
 import DishIngredientItem from "../../components/DishIngredientItem.vue";
@@ -67,79 +68,24 @@ export default {
   },
   data() {
     return {
-      dish: {
-        id: 1,
-        img: '/dish1_big.png',
-        name: "Паста болоньезе",
-        description:
-          "Блюдо итальянского происхождения, разновидность сервировки пасты, а также используемый при такой сервировке мясной соус Блюдо итальянского происхождения, разновидность сервировки пасты, а также используемый при такой сервировке ",
-        caloriesList: [
-          {
-               id: 1,
-               name: 'белки',
-               counterNum: 31,
-               counterText: 'грамм' 
-          },
-          {
-               id: 1,
-               name: 'белки',
-               counterNum: 31,
-               counterText: 'грамм' 
-          },
-          {
-               id: 1,
-               name: 'белки',
-               counterNum: 31,
-               counterText: 'грамм' 
-          },
-          {
-               id: 1,
-               name: 'белки',
-               counterNum: 31,
-               counterText: 'грамм' 
-          },
-        ],
-        ingredients: [
-          {
-            id: 1,
-            name: "Мясной фарш",
-            counter: "500 г.",
-          },
-          {
-            id: 1,
-            name: "Мясной фарш",
-            counter: "500 г.",
-          },
-          {
-            id: 1,
-            name: "Мясной фарш",
-            counter: "500 г.",
-          },
-          {
-            id: 1,
-            name: "Мясной фарш",
-            counter: "500 г.",
-          },
-        ],
-        reciepeList: [
-          {
-            id: 1,
-            step: 1,
-            text: "В сковороде на растительном масле обжарить мелко нарезанный лук и чеснок до характерного запаха.",
-          },
-          {
-            id: 1,
-            step: 1,
-            text: "В сковороде на растительном масле обжарить мелко нарезанный лук и чеснок до характерного запаха.",
-          },
-          {
-            id: 1,
-            step: 1,
-            text: "В сковороде на растительном масле обжарить мелко нарезанный лук и чеснок до характерного запаха.",
-          },
-        ],
-      },
+      dish: {},
     };
+  },
+  methods: {
+    async getDishInfo(id) {
+      try {
+        const response = await fetch(`${API_URL}/dish?dish_id=${id}`);
+        const result = await response.json();
+        this.dish = result;
+        console.log(this.dish);
+        
+      } catch (e) {
+        console.log("Ошибка получения информации о блюде: ", e);
+      }
+    },
+  },
+  mounted() {
+    this.getDishInfo(this.$route.params.id);
   },
 };
 </script>
@@ -161,6 +107,7 @@ export default {
     width: 450px;
     height: 350px;
     object-fit: fill;
+    flex-shrink: 0;
     border-radius: 24px;
   }
 
@@ -168,10 +115,12 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    width: 100%;
   }
 
   &__info-block1 {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto;
     align-items: flex-start;
     column-gap: 60px;
   }

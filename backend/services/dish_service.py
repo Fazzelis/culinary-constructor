@@ -12,6 +12,7 @@ from uuid import UUID
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
 from schemas.internal.dish_schema import DishForCatalogSchema
+from schemas.internal.pagination_schema import PaginationSchema
 
 
 class DishService:
@@ -102,8 +103,8 @@ class DishService:
             recipe_steps=recipe_steps
         )
 
-    async def get_all_dishes(self) -> DishesResponseSchema:
-        dishes = await self.dish_repository.get_all()
+    async def get_all_dishes(self, page: int, page_size: int) -> DishesResponseSchema:
+        dishes, total_count = await self.dish_repository.get_all(page=page, page_size=page_size)
         dishes_response = []
         for dish in dishes:
             dishes_response.append(
@@ -116,5 +117,11 @@ class DishService:
             )
 
         return DishesResponseSchema(
+            pagination=PaginationSchema(
+                page=page,
+                page_size=page_size,
+                total_count=total_count,
+                total_pages=(total_count + page_size - 1) // page_size
+            ),
             dishes=dishes_response
         )

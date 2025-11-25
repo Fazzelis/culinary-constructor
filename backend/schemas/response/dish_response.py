@@ -3,6 +3,7 @@ from uuid import UUID
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
 from schemas.internal.dish_schema import DishForCatalogSchema
+from schemas.internal.pagination_schema import PaginationSchema
 
 
 class DishResponseSchema(BaseModel):
@@ -15,4 +16,5 @@ class DishResponseSchema(BaseModel):
 
 
 class DishesResponseSchema(BaseModel):
+    pagination: PaginationSchema
     dishes: list[DishForCatalogSchema]

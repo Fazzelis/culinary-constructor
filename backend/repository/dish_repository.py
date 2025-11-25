@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from models.dish import Dish
 from models.dish_ingredient_association import DishIngredientAssociation
-from sqlalchemy import select, delete
+from sqlalchemy import select, delete, func
 from sqlalchemy.orm import selectinload
 from uuid import UUID
 
@@ -30,10 +30,13 @@ class DishRepository:
         dish = result.scalar_one_or_none()
         return dish
 
-    async def get_all(self):
-        result = await self.db.execute(select(Dish))
+    async def get_all(self, page: int, page_size: int):
+        offset = (page - 1) * page_size
+        result = await self.db.execute(select(Dish).offset(offset).limit(page_size))
         dishes = result.scalars().all()
-        return dishes
+        count_result = await self.db.execute(select(func.count(Dish.id)))
+        total_count = count_result.scalar_one()
+        return dishes, total_count
 
     async def delete(self, dish_id: UUID):
         result = await self.db.execute(delete(Dish).where(Dish.id == dish_id))

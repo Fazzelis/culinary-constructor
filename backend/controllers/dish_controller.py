@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from schemas.request.dish_request import DishRequestSchema
 from dependencies import get_dish_service
 from services.dish_service import DishService
@@ -30,6 +30,8 @@ async def get_dish(
 
 @router.get("/all")
 async def get_all_dishes(
+        page: int = Query(1, ge=1, description="Номер страницы"),
+        page_size: int = Query(5, ge=1, le=100, description="Количество элементов на одной странице"),
         dish_service: DishService = Depends(get_dish_service)
 ):
-    return await dish_service.get_all_dishes()
+    return await dish_service.get_all_dishes(page=page, page_size=page_size)

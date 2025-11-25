@@ -32,7 +32,14 @@ class DishRepository:
 
     async def get_all(self, page: int, page_size: int):
         offset = (page - 1) * page_size
-        result = await self.db.execute(select(Dish).offset(offset).limit(page_size))
+        result = await self.db.execute(
+            select(Dish)
+            .offset(offset)
+            .limit(page_size)
+            .options(
+                selectinload(Dish.ingredient_associations)
+            )
+        )
         dishes = result.scalars().all()
         count_result = await self.db.execute(select(func.count(Dish.id)))
         total_count = count_result.scalar_one()

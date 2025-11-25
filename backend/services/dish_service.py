@@ -112,7 +112,8 @@ class DishService:
                     id=dish.id,
                     name=dish.name,
                     description=dish.description,
-                    img=dish.img
+                    img=dish.img,
+                    total_ingredients=len(dish.ingredient_associations)
                 )
             )
 
@@ -140,7 +141,8 @@ class DishService:
                     id=dish.id,
                     name=dish.name,
                     description=dish.description,
-                    img=dish.img
+                    img=dish.img,
+                    total_ingredients=len(dish.ingredient_associations)
                 )
             )
 

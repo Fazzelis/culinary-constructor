@@ -10,6 +10,7 @@ class Dish(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, server_default=func.gen_random_uuid())
     name = Column(String)
     description = Column(String)
+    cooking_time = Column(String)
     img = Column(String)
     protein = Column(Integer)
     fats = Column(Integer)

@@ -11,6 +11,10 @@ class DishResponseSchema(BaseModel):
     name: str
     description: str
     img: str
+    protein: int | None = None
+    fats: int | None = None
+    carbs: int | None = None
+    calories: int | None = None
     ingredients: list[IngredientSchema]
     recipe_steps: list[RecipeSchema]
 

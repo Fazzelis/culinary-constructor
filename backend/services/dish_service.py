@@ -13,6 +13,7 @@ from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
 from schemas.internal.dish_schema import DishForCatalogSchema
 from schemas.internal.pagination_schema import PaginationSchema
+from utils.api_utils import search_dish
 
 
 class DishService:
@@ -30,7 +31,23 @@ class DishService:
                 detail=f"Attachment с id {payload.img_id} не найден"
             )
         icon_url = settings.get_attachment_url + str(attachment.id)
-        dish = await self.dish_repository.post(name=payload.name, description=payload.description, img=icon_url)
+        founded_dish_info = await search_dish(payload.name)
+        if not founded_dish_info:
+            dish = await self.dish_repository.post(
+                name=payload.name,
+                description=payload.description,
+                img=icon_url
+            )
+        else:
+            dish = await self.dish_repository.post(
+                name=payload.name,
+                description=payload.description,
+                img=icon_url,
+                protein=int(float(founded_dish_info["protein"])),
+                fats=int(float(founded_dish_info["fat"])),
+                carbs=int(float(founded_dish_info["carbs"])),
+                calories=int(float(founded_dish_info["calories"]))
+            )
         try:
             recipe_steps = []
             for recipe_step in payload.recipe_steps:
@@ -61,6 +78,10 @@ class DishService:
                 name=dish.name,
                 description=dish.description,
                 img=dish.img,
+                protein=dish.protein,
+                fats=dish.fats,
+                carbs=dish.carbs,
+                calories=dish.calories,
                 ingredients=dish_ingredient_association,
                 recipe_steps=recipe_steps
             )
@@ -99,6 +120,10 @@ class DishService:
             name=dish.name,
             description=dish.description,
             img=dish.img,
+            protein=dish.protein,
+            fats=dish.fats,
+            carbs=dish.carbs,
+            calories=dish.calories,
             ingredients=ingredients,
             recipe_steps=recipe_steps
         )

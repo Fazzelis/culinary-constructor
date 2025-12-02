@@ -14,6 +14,7 @@ class DishRepository:
             self,
             name: str,
             description: str,
+            cooking_time: str,
             img: str,
             protein: int = None,
             fats: int = None,
@@ -23,6 +24,7 @@ class DishRepository:
         dish = Dish(
             name=name,
             description=description,
+            cooking_time=cooking_time,
             img=img,
             protein=protein,
             fats=fats,

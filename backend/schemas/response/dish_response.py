@@ -10,6 +10,7 @@ class DishResponseSchema(BaseModel):
     id: UUID
     name: str
     description: str
+    cooking_time: str
     img: str
     protein: int | None = None
     fats: int | None = None

@@ -36,12 +36,14 @@ class DishService:
             dish = await self.dish_repository.post(
                 name=payload.name,
                 description=payload.description,
+                cooking_time=payload.cooking_time,
                 img=icon_url
             )
         else:
             dish = await self.dish_repository.post(
                 name=payload.name,
                 description=payload.description,
+                cooking_time=payload.cooking_time,
                 img=icon_url,
                 protein=int(float(founded_dish_info["protein"])),
                 fats=int(float(founded_dish_info["fat"])),
@@ -77,6 +79,7 @@ class DishService:
                 id=dish.id,
                 name=dish.name,
                 description=dish.description,
+                cooking_time=dish.cooking_time,
                 img=dish.img,
                 protein=dish.protein,
                 fats=dish.fats,
@@ -136,6 +139,7 @@ class DishService:
                 DishForCatalogSchema(
                     id=dish.id,
                     name=dish.name,
+                    cooking_time=dish.cooking_time,
                     description=dish.description,
                     img=dish.img,
                     total_ingredients=len(dish.ingredient_associations)
@@ -166,6 +170,7 @@ class DishService:
                     id=dish.id,
                     name=dish.name,
                     description=dish.description,
+                    cooking_time=dish.cooking_time,
                     img=dish.img,
                     total_ingredients=len(dish.ingredient_associations)
                 )

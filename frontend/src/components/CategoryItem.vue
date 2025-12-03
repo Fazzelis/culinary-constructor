@@ -10,7 +10,11 @@
       <SvgTriangle />
     </button>
     <transition name="category-list">
-      <ul class="category__list" v-show="openCategories[category.id]" v-if="categoryIngredients">
+      <ul
+        class="category__list"
+        v-show="openCategories[category.id]"
+        v-if="categoryIngredients"
+      >
         <IngredientItem
           v-for="ingredient in categoryIngredients.ingredients"
           :key="ingredient.id"
@@ -36,8 +40,8 @@ export default {
       required: true,
     },
     categoryIngredients: {
-      type: Object,
-      required: true,
+      type: [Object, null, undefined],
+      default: null,
     },
     openCategories: {
       type: Object,
@@ -48,15 +52,6 @@ export default {
       required: true,
     },
   },
-  methods: {
-    log() {
-      console.log(this.categoryIngredients);
-      
-    }
-  },
-  mounted() {
-    this.log()
-  }
 };
 </script>
 

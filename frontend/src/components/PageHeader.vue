@@ -12,7 +12,10 @@
             >
           </li>
           <li class="page-header__item">
-            <router-link to="/catalog" class="page-header__link"
+            <router-link
+              to="/catalog"
+              class="page-header__link"
+              @click.prevent="goToCatalog"
               >Каталог рецептов</router-link
             >
           </li>
@@ -29,6 +32,13 @@ import MyInput from "./UI/MyInput.vue";
 
 export default {
   components: { SvgLogo, MyInput },
+  methods: {
+    goToCatalog() {
+      this.$router.push({ name: "catalog" }).then(() => {
+        history.replaceState({}, '', window.location.href);
+      });
+    },
+  },
 };
 </script>
 

@@ -3,9 +3,7 @@
     <div class="catalog__container container">
       <div class="catalog__info">
         <h1 class="catalog__title title">Каталог</h1>
-        <span class="catalog__counter"
-          >Найдено рецептов: {{ totalCount }}</span
-        >
+        <span class="catalog__counter">Найдено рецептов: {{ totalCount }}</span>
       </div>
       <dish-list :dishList="dishList" />
       <div class="catalog__pagination pagination">
@@ -13,7 +11,10 @@
           v-for="page in visiblePages"
           :key="page"
           class="pagination__item"
-          :class="{ active: page === currentPage, dots: page === '...' }"
+          :class="{
+            'button-s--active': page === currentPage,
+            dots: page === '...',
+          }"
           @click="page !== '...' && goPage(page)"
         >
           {{ page }}
@@ -35,6 +36,7 @@ export default {
   data() {
     return {
       page: 1,
+      currentPage: 1,
       limit: 5,
       totalPages: 0,
       totalCount: 0,
@@ -43,16 +45,23 @@ export default {
   },
   methods: {
     async getDishList() {
-      try {
-        const response = await fetch(
-          `${API_URL}/dish/all?page=${this.page}&page_size=${this.limit}`
-        );
-        const result = await response.json();
-        this.dishList = result.dishes;
-        this.totalPages = result.pagination.total_pages;
-        this.totalCount = result.pagination.total_count
-      } catch (e) {
-        console.log("Ошибка получения списка блюд: ", e);
+      if (history.state && history.state.dishList) {
+        this.dishList = history.state.dishList;
+        this.totalPages = history.state.totalPages;
+        this.totalCount = history.state.totalCount;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        try {
+          const response = await fetch(
+            `${API_URL}/dish/all?page=${this.page}&page_size=${this.limit}`
+          );
+          const result = await response.json();
+          this.dishList = result.dishes;
+          this.totalPages = result.pagination.total_pages;
+          this.totalCount = result.pagination.total_count;
+        } catch (e) {
+          console.log("Ошибка получения списка блюд: ", e);
+        }
       }
     },
     async goPage(pageNum) {
@@ -62,7 +71,8 @@ export default {
         );
         const result = await response.json();
         this.dishList = result.dishes;
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        this.currentPage = pageNum;
       } catch (e) {
         console.log("Ошибка получения списка блюд: ", e);
       }

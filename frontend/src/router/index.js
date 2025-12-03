@@ -20,7 +20,13 @@ const router = createRouter({
             name: "dish",
             component: () => import("@/pages/dish/[id].vue"),
             meta: { requiresAuth: false },
-        }
+        },
+        {
+            path: "/404",
+            name: "404",
+            component: () => import("@/pages/NotFound.vue"),
+            meta: { requiresAuth: false },
+        },
     ]
 });
 

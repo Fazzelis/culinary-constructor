@@ -6,12 +6,12 @@
         <dish-tag>
           <svg-tag-ingredient />
           <span class="tag__info"
-            >Ингредиентов: {{ dish.countIngredients }}</span
+            >Ингредиентов: {{ dish.total_ingredients }}</span
           >
         </dish-tag>
         <dish-tag>
           <svg-tag-time />
-          <span class="tag__info">Время: {{ dish.time }}</span>
+          <span class="tag__info">Время: {{ dish.cooking_time }}</span>
         </dish-tag>
       </div>
       <div class="dish-card__info">

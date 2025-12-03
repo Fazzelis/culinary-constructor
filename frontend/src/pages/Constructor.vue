@@ -18,7 +18,7 @@
         <span class="constructor__counter"
           >Выбрано ингредиентов: {{ countIngredients }}</span
         >
-        <MyButton>Подобрать рецепт</MyButton>
+        <MyButton @click="searchDishes">Подобрать рецепт</MyButton>
       </div>
     </div>
   </div>
@@ -34,7 +34,6 @@ export default {
   components: { SvgTriangle, MyButton, CategoryItem },
   data() {
     return {
-      countIngredients: 0,
       openCategories: {},
       selectedIngredients: [],
       categories: [],
@@ -85,7 +84,39 @@ export default {
         this.selectedIngredients.splice(index, 1);
       }
     },
+    async searchDishes() {
+      try {
+        let str = "";
+        this.selectedIngredients.forEach((item) => {
+          str += `ingredients=${item}&`;
+        });
+
+        const response = await fetch(`${API_URL}/dish/search?${str}`);
+
+        const result = await response.json();
+        const dishList = result.dishes;
+
+        if (dishList.length) {
+          const totalCount = result.pagination.total_count;
+          const totalPages = result.pagination.total_pages;
+          this.$router.push({
+            path: "/catalog",
+            state: {
+              dishList,
+              totalCount,
+              totalPages,
+            },
+          });
+        } else {
+          // window.scrollTo({ top: 0, behavior: "smooth" });
+          this.$router.push("/404");
+        }
+      } catch (e) {
+        console.log("Ошибка при поиске блюд: ", e);
+      }
+    },
   },
+
   computed: {
     countIngredients() {
       return this.selectedIngredients.length;

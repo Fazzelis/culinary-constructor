@@ -19,11 +19,15 @@
           </div>
           <div class="dish__info-block2">
             <h2 class="dish__subtitle">Энергетическая ценность</h2>
-            <!-- <div class="dish__calories">
-              <CaloriesItem v-for="calories in dish.caloriesList" :key="calories.id" :calories="calories">
-                <SvgSquirrels />
+            <div class="dish__calories">
+              <CaloriesItem
+                v-for="item in dish.caloriesList"
+                :key="item.name"
+                :item="item"
+                :iconComponent="iconsMap[item.name.toLowerCase()]"
+              >
               </CaloriesItem>
-            </div> -->
+            </div>
           </div>
         </div>
       </div>
@@ -51,8 +55,12 @@
 </template>
 
 <script>
+import { markRaw } from "vue";
 import { API_URL } from "../../api.config";
-import SvgSquirrels from "../../assets/icons/SvgSquirrels.vue";
+import SvgCalories from "../../assets/icons/SvgCalories.vue";
+import SvgCarbs from "../../assets/icons/SvgCarbs.vue";
+import SvgFats from "../../assets/icons/SvgFats.vue";
+import SvgProtein from "../../assets/icons/SvgProtein.vue";
 import CaloriesItem from "../../components/CaloriesItem.vue";
 import DishIngredientItem from "../../components/DishIngredientItem.vue";
 import ReciepeItem from "../../components/ReciepeItem.vue";
@@ -61,14 +69,23 @@ import MyButton from "../../components/UI/MyButton.vue";
 export default {
   components: {
     MyButton,
-    SvgSquirrels,
     CaloriesItem,
     DishIngredientItem,
     ReciepeItem,
+    SvgCalories,
+    SvgCarbs,
+    SvgFats,
+    SvgProtein,
   },
   data() {
     return {
       dish: {},
+      iconsMap: markRaw({
+        белки: SvgProtein,
+        жиры: SvgFats,
+        углеводы: SvgCarbs,
+        калории: SvgCalories,
+      }),
     };
   },
   methods: {
@@ -77,8 +94,6 @@ export default {
         const response = await fetch(`${API_URL}/dish?dish_id=${id}`);
         const result = await response.json();
         this.dish = result;
-        console.log(this.dish);
-        
       } catch (e) {
         console.log("Ошибка получения информации о блюде: ", e);
       }

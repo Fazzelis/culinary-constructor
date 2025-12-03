@@ -11,7 +11,7 @@ from configuration import settings
 from uuid import UUID
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
-from schemas.internal.dish_schema import DishForCatalogSchema
+from schemas.internal.dish_schema import DishForCatalogSchema, CaloriesSchema
 from schemas.internal.pagination_schema import PaginationSchema
 from utils.api_utils import search_dish
 
@@ -75,16 +75,39 @@ class DishService:
                     name=association.ingredient.name,
                     count=association.count
                 ))
+            calories_list = [
+                CaloriesSchema(
+                    name="Белки",
+                    counterNum=dish.protein,
+                    counterText="грамм"
+                ),
+                CaloriesSchema(
+                    name="Жиры",
+                    counterNum=dish.fats,
+                    counterText="грамм"
+                ),
+                CaloriesSchema(
+                    name="Углеводы",
+                    counterNum=dish.carbs,
+                    counterText="грамм"
+                ),
+                CaloriesSchema(
+                    name="Калории",
+                    counterNum=dish.calories,
+                    counterText="ккал"
+                )
+            ]
             return DishResponseSchema(
                 id=dish.id,
                 name=dish.name,
                 description=dish.description,
                 cooking_time=dish.cooking_time,
                 img=dish.img,
-                protein=dish.protein,
-                fats=dish.fats,
-                carbs=dish.carbs,
-                calories=dish.calories,
+                # protein=dish.protein,
+                # fats=dish.fats,
+                # carbs=dish.carbs,
+                # calories=dish.calories,
+                caloriesList=calories_list,
                 ingredients=dish_ingredient_association,
                 recipe_steps=recipe_steps
             )
@@ -118,15 +141,39 @@ class DishService:
                 )
             )
 
+        calories_list = [
+            CaloriesSchema(
+                name="Белки",
+                counterNum=dish.protein,
+                counterText="грамм"
+            ),
+            CaloriesSchema(
+                name="Жиры",
+                counterNum=dish.fats,
+                counterText="грамм"
+            ),
+            CaloriesSchema(
+                name="Углеводы",
+                counterNum=dish.carbs,
+                counterText="грамм"
+            ),
+            CaloriesSchema(
+                name="Калории",
+                counterNum=dish.calories,
+                counterText="ккал"
+            )
+        ]
+
         return DishResponseSchema(
             id=dish.id,
             name=dish.name,
             description=dish.description,
             img=dish.img,
-            protein=dish.protein,
-            fats=dish.fats,
-            carbs=dish.carbs,
-            calories=dish.calories,
+            # protein=dish.protein,
+            # fats=dish.fats,
+            # carbs=dish.carbs,
+            # calories=dish.calories,
+            caloriesList=calories_list,
             ingredients=ingredients,
             recipe_steps=recipe_steps
         )
@@ -156,7 +203,12 @@ class DishService:
             dishes=dishes_response
         )
 
-    async def get_dishes_by_ingredients(self, ingredients: list[UUID], page: int, page_size: int):
+    async def get_dishes_by_ingredients(
+            self,
+            ingredients: list[UUID],
+            page: int,
+            page_size: int
+    ) -> DishesResponseSchema:
         dishes, total_count = await self.dish_repository.get_by_ingredient_ids(
             ingredient_ids=ingredients,
             page=page,

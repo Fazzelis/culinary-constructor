@@ -9,3 +9,9 @@ class DishForCatalogSchema(BaseModel):
     cooking_time: str
     img: str
     total_ingredients: int
+
+
+class CaloriesSchema(BaseModel):
+    name: str
+    counterNum: int
+    counterText: str

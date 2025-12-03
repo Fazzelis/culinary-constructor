@@ -42,9 +42,8 @@ def extract_off_nutrition(product):
 
 
 async def main():
-    # Одиночный запрос
-    result = await search_dish("123")
-    print(result, result["calories"])
+    result = await search_dish("Борщ")
+    print(result)
 
 
 if __name__ == "__main__":

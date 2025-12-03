@@ -4,6 +4,7 @@ from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
 from schemas.internal.dish_schema import DishForCatalogSchema
 from schemas.internal.pagination_schema import PaginationSchema
+from schemas.internal.dish_schema import CaloriesSchema
 
 
 class DishResponseSchema(BaseModel):
@@ -12,10 +13,11 @@ class DishResponseSchema(BaseModel):
     description: str
     cooking_time: str | None = None
     img: str
-    protein: int | None = None
-    fats: int | None = None
-    carbs: int | None = None
-    calories: int | None = None
+    # protein: int | None = None
+    # fats: int | None = None
+    # carbs: int | None = None
+    # calories: int | None = None
+    caloriesList: list[CaloriesSchema]
     ingredients: list[IngredientSchema]
     recipe_steps: list[RecipeSchema]
 

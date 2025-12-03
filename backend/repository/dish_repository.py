@@ -10,8 +10,27 @@ class DishRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
 
-    async def post(self, name: str, description: str, img: str) -> Dish:
-        dish = Dish(name=name, description=description, img=img)
+    async def post(
+            self,
+            name: str,
+            description: str,
+            cooking_time: str,
+            img: str,
+            protein: int = None,
+            fats: int = None,
+            carbs: int = None,
+            calories: int = None
+    ) -> Dish:
+        dish = Dish(
+            name=name,
+            description=description,
+            cooking_time=cooking_time,
+            img=img,
+            protein=protein,
+            fats=fats,
+            carbs=carbs,
+            calories=calories
+        )
         self.db.add(dish)
         await self.db.commit()
         await self.db.refresh(dish)

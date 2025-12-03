@@ -11,8 +11,9 @@ from configuration import settings
 from uuid import UUID
 from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.recipe_schema import RecipeSchema
-from schemas.internal.dish_schema import DishForCatalogSchema
+from schemas.internal.dish_schema import DishForCatalogSchema, CaloriesSchema
 from schemas.internal.pagination_schema import PaginationSchema
+from utils.api_utils import search_dish
 
 
 class DishService:
@@ -30,7 +31,25 @@ class DishService:
                 detail=f"Attachment с id {payload.img_id} не найден"
             )
         icon_url = settings.get_attachment_url + str(attachment.id)
-        dish = await self.dish_repository.post(name=payload.name, description=payload.description, img=icon_url)
+        founded_dish_info = await search_dish(payload.name)
+        if not founded_dish_info:
+            dish = await self.dish_repository.post(
+                name=payload.name,
+                description=payload.description,
+                cooking_time=payload.cooking_time,
+                img=icon_url
+            )
+        else:
+            dish = await self.dish_repository.post(
+                name=payload.name,
+                description=payload.description,
+                cooking_time=payload.cooking_time,
+                img=icon_url,
+                protein=int(float(founded_dish_info["protein"])),
+                fats=int(float(founded_dish_info["fat"])),
+                carbs=int(float(founded_dish_info["carbs"])),
+                calories=int(float(founded_dish_info["calories"]))
+            )
         try:
             recipe_steps = []
             for recipe_step in payload.recipe_steps:
@@ -56,11 +75,39 @@ class DishService:
                     name=association.ingredient.name,
                     count=association.count
                 ))
+            calories_list = [
+                CaloriesSchema(
+                    name="Белки",
+                    counterNum=dish.protein,
+                    counterText="грамм"
+                ),
+                CaloriesSchema(
+                    name="Жиры",
+                    counterNum=dish.fats,
+                    counterText="грамм"
+                ),
+                CaloriesSchema(
+                    name="Углеводы",
+                    counterNum=dish.carbs,
+                    counterText="грамм"
+                ),
+                CaloriesSchema(
+                    name="Калории",
+                    counterNum=dish.calories,
+                    counterText="ккал"
+                )
+            ]
             return DishResponseSchema(
                 id=dish.id,
                 name=dish.name,
                 description=dish.description,
+                cooking_time=dish.cooking_time,
                 img=dish.img,
+                # protein=dish.protein,
+                # fats=dish.fats,
+                # carbs=dish.carbs,
+                # calories=dish.calories,
+                caloriesList=calories_list,
                 ingredients=dish_ingredient_association,
                 recipe_steps=recipe_steps
             )
@@ -94,11 +141,39 @@ class DishService:
                 )
             )
 
+        calories_list = [
+            CaloriesSchema(
+                name="Белки",
+                counterNum=dish.protein,
+                counterText="грамм"
+            ),
+            CaloriesSchema(
+                name="Жиры",
+                counterNum=dish.fats,
+                counterText="грамм"
+            ),
+            CaloriesSchema(
+                name="Углеводы",
+                counterNum=dish.carbs,
+                counterText="грамм"
+            ),
+            CaloriesSchema(
+                name="Калории",
+                counterNum=dish.calories,
+                counterText="ккал"
+            )
+        ]
+
         return DishResponseSchema(
             id=dish.id,
             name=dish.name,
             description=dish.description,
             img=dish.img,
+            # protein=dish.protein,
+            # fats=dish.fats,
+            # carbs=dish.carbs,
+            # calories=dish.calories,
+            caloriesList=calories_list,
             ingredients=ingredients,
             recipe_steps=recipe_steps
         )
@@ -111,6 +186,7 @@ class DishService:
                 DishForCatalogSchema(
                     id=dish.id,
                     name=dish.name,
+                    cooking_time=dish.cooking_time,
                     description=dish.description,
                     img=dish.img,
                     total_ingredients=len(dish.ingredient_associations)
@@ -127,7 +203,12 @@ class DishService:
             dishes=dishes_response
         )
 
-    async def get_dishes_by_ingredients(self, ingredients: list[UUID], page: int, page_size: int):
+    async def get_dishes_by_ingredients(
+            self,
+            ingredients: list[UUID],
+            page: int,
+            page_size: int
+    ) -> DishesResponseSchema:
         dishes, total_count = await self.dish_repository.get_by_ingredient_ids(
             ingredient_ids=ingredients,
             page=page,
@@ -141,6 +222,7 @@ class DishService:
                     id=dish.id,
                     name=dish.name,
                     description=dish.description,
+                    cooking_time=dish.cooking_time,
                     img=dish.img,
                     total_ingredients=len(dish.ingredient_associations)
                 )

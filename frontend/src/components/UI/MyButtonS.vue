@@ -1,5 +1,5 @@
 <template>
-  <button class="button-s" title="Найти блюдо">
+  <button class="button-s">
     <slot></slot>
   </button>
 </template>
@@ -25,6 +25,15 @@
 
     svg {
       color: @orange;
+    }
+  }
+
+  &--active {
+    background-color: @light;
+
+    &:hover {
+      background-color: @orange;
+      color: @black;
     }
   }
 }

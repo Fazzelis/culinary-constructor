@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
         <input type="text" class="wrapper__input" placeholder="Название" aria-label="Поле поиска блюда">
-        <MyButtonS class="wrapper__btn">
+        <MyButtonS class="wrapper__btn" title="Найти блюдо">
             <SvgSearch />
         </MyButtonS>
     </div>

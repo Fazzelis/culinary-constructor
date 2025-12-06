@@ -1,7 +1,7 @@
 <template>
     <div class="wrapper">
-        <input type="text" class="wrapper__input" placeholder="Название" aria-label="Поле поиска блюда">
-        <MyButtonS class="wrapper__btn" title="Найти блюдо">
+        <input type="text" class="wrapper__input" placeholder="Название" aria-label="Поле поиска блюда" :value="modelValue" @input="updateInput">
+        <MyButtonS class="wrapper__btn" title="Найти блюдо" @click="$emit('searchDish')">
             <SvgSearch />
         </MyButtonS>
     </div>
@@ -13,6 +13,14 @@ import MyButtonS from './MyButtonS.vue';
 
 export default {
     components: {MyButtonS, SvgSearch},
+    props: {
+        modelValue: [String, Number],
+    },
+    methods: {
+        updateInput(event) {
+            this.$emit('update:modelValue', event.target.value)
+        },
+    },
 }
 </script>
 

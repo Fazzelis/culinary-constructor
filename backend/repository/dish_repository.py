@@ -100,6 +100,31 @@ class DishRepository:
 
         return dishes, total_count
 
+    async def get_by_name(self, name: str, page: int, page_size: int):
+        offset = (page - 1) * page_size
+        result = await self.db.execute(
+            select(Dish)
+            .where(Dish.name.ilike(f"%{name}%"))
+            .order_by(Dish.name)
+            .offset(offset)
+            .limit(page_size)
+            .options(
+                selectinload(Dish.recipe_steps),
+                selectinload(Dish.ingredient_associations)
+                .selectinload(DishIngredientAssociation.ingredient)
+            )
+        )
+        dishes = result.scalars().all()
+
+        matching_dishes_subquery = (
+            select(Dish.id)
+            .where(Dish.name.ilike(f"%{name}%"))
+        ).subquery()
+
+        count_result = await self.db.execute(func.count(matching_dishes_subquery))
+        total_count = count_result.scalar_one()
+        return dishes, total_count
+
     async def delete(self, dish_id: UUID):
         result = await self.db.execute(delete(Dish).where(Dish.id == dish_id))
         await self.db.commit()

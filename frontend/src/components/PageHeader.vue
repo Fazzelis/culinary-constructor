@@ -21,22 +21,56 @@
           </li>
         </ul>
       </nav>
-      <MyInput />
+      <MyInput v-model="searchName" @searchDish="searchDish"/>
     </div>
   </header>
 </template>
 
 <script>
+import { API_URL } from '../api.config';
 import SvgLogo from "../assets/icons/SvgLogo.vue";
 import MyInput from "./UI/MyInput.vue";
 
 export default {
   components: { SvgLogo, MyInput },
+  data() {
+    return {
+      searchName: ''
+    }
+  },
   methods: {
     goToCatalog() {
       this.$router.push({ name: "catalog" }).then(() => {
         history.replaceState({}, '', window.location.href);
       });
+    },
+    async searchDish() {
+      try {
+        const response = await fetch(
+          `${API_URL}/dish/search-by-name?dish_name=${this.searchName}`
+        );
+        const result = await response.json();
+        const dishList = result.dishes;
+
+        if (dishList.length) {
+          const totalCount = result.pagination.total_count;
+          const totalPages = result.pagination.total_pages;
+          this.searchName = ''
+          this.$router.push({
+            path: "/catalog",
+            state: {
+              dishList,
+              totalCount,
+              totalPages,
+            },
+          });
+        } else {
+          this.searchName = ''
+          this.$router.push("/404");
+        }
+      } catch (e) {
+        console.log("Ошибка при поиске блюд: ", e);
+      }
     },
   },
 };

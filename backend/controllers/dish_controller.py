@@ -5,6 +5,7 @@ from services.dish_service import DishService
 from schemas.response.dish_response import DishResponseSchema
 from uuid import UUID
 from schemas.response.dish_response import DishesResponseSchema
+from fastapi.responses import Response
 
 
 router = APIRouter(
@@ -56,3 +57,11 @@ async def get_dishes_by_name(
         dish_service: DishService = Depends(get_dish_service)
 ):
     return await dish_service.get_dishes_by_name(name=dish_name, page=page, page_size=page_size)
+
+
+@router.get("/save-as-pdf", response_class=Response)
+async def save_as_pdf(
+        dish_id: UUID,
+        dish_service: DishService = Depends(get_dish_service)
+):
+    return await dish_service.save_as_pdf(dish_id=dish_id)

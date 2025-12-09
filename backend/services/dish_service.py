@@ -1,19 +1,25 @@
+import urllib.parse
+from uuid import UUID
+
+from fastapi import HTTPException, status
+from fastapi.responses import Response
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from schemas.request.dish_request import DishRequestSchema
+
+from configuration import settings
+from repository.attachment_repository import AttachmentRepository
+from repository.dish_ingredient_association_repository import DishIngredientRepository
 from repository.dish_repository import DishRepository
 from repository.recipe_step_repository import RecipeStepRepository
-from repository.dish_ingredient_association_repository import DishIngredientRepository
-from repository.attachment_repository import AttachmentRepository
-from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status
-from schemas.response.dish_response import DishResponseSchema, DishesResponseSchema
-from configuration import settings
-from uuid import UUID
-from schemas.internal.ingredient_schema import IngredientSchema
-from schemas.internal.recipe_schema import RecipeSchema
 from schemas.internal.dish_schema import DishForCatalogSchema, CaloriesSchema
+from schemas.internal.ingredient_schema import IngredientSchema
 from schemas.internal.pagination_schema import PaginationSchema
+from schemas.internal.recipe_schema import RecipeSchema
+from schemas.request.dish_request import DishRequestSchema
+from schemas.response.dish_response import DishResponseSchema, DishesResponseSchema
 from utils.api_utils import search_dish
+from utils.render_html_utils import render_html_template
+from pyppeteer import launch
 
 
 class DishService:
@@ -272,3 +278,72 @@ class DishService:
             ),
             dishes=dishes_response
         )
+
+    async def save_as_pdf(self, dish_id: UUID):
+        dish = await self.dish_repository.get(dish_id=dish_id)
+        if not dish:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Блюда с id {dish_id} не найдено"
+            )
+
+        ingredients = []
+        for ingredient_association in dish.ingredient_associations:
+            ingredients.append(
+                {
+                    "name": ingredient_association.ingredient.name,
+                    "count": ingredient_association.count
+                }
+            )
+
+        recipe_steps = []
+        for recipe_step in dish.recipe_steps:
+            recipe_steps.append(
+                {
+                    "step_number": recipe_step.step_number,
+                    "description": recipe_step.description
+                }
+            )
+
+        dish_data = {
+            "name": dish.name,
+            "description": dish.description,
+
+            "ingredients": ingredients,
+            "recipe_steps": recipe_steps
+        }
+        html_content = render_html_template(dish=dish_data)
+
+        browser = None
+        try:
+            browser = await launch(
+                executablePath=settings.chrome_path,
+                headless=True,
+                args=['--no-sandbox', '--disable-setuid-sandbox']
+            )
+            page = await browser.newPage()
+            await page.setContent(html_content)
+
+            pdf_bytes = await page.pdf({
+                'format': 'A4',
+                'printBackground': True,
+                'margin': {
+                    'top': '20px',
+                    'right': '20px',
+                    'bottom': '20px',
+                    'left': '20px'
+                }
+            })
+
+            filename = urllib.parse.quote(dish.name)
+            return Response(
+                content=pdf_bytes,
+                media_type='application/pdf',
+                headers={
+                    'Content-Disposition': f'attachment; filename*=UTF-8\'\'{filename}.pdf',
+                    'Content-Type': 'application/pdf'
+                }
+            )
+        finally:
+            if browser:
+                await browser.close()

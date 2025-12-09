@@ -15,7 +15,7 @@
             <div class="dish__description">
               <p>{{ dish.description }}</p>
             </div>
-            <MyButton class="dish__btn">Сохранить</MyButton>
+            <MyButton class="dish__btn" @click="savePdf">Сохранить</MyButton>
           </div>
           <div class="dish__info-block2">
             <h2 class="dish__subtitle">Энергетическая ценность</h2>
@@ -96,6 +96,30 @@ export default {
         this.dish = result;
       } catch (e) {
         console.log("Ошибка получения информации о блюде: ", e);
+      }
+    },
+    async savePdf() {
+      const id = this.$route.params.id;
+      try {
+        const response = await fetch(
+          `${API_URL}/dish/save-as-pdf?dish_id=${id}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Ошибка сервера");
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `${this.dish.name}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } catch (e) {
+        console.log("Ошибка при сохранении файла", e);
       }
     },
   },
